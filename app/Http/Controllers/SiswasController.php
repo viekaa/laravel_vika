@@ -44,6 +44,15 @@ class SiswasController extends Controller
      */
     public function store(Request $request)
     {
+
+        $request->validate([
+            'nis'           => 'required',
+            'nama'          => 'required',
+            'jenis_kelamin' => 'required',
+            'kelas'         => 'required',
+
+        ]);
+
         //proses data
         $siswa                = new Siswa;
         $siswa->nis           = $request->nis;

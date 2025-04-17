@@ -1,21 +1,22 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SiswasController;
-use App\Http\Controllers\PpdbsController;
-use App\Http\Controllers\PenggunasController;
-use App\Http\Controllers\TeleponController;
-use App\Http\Controllers\KategoriController;
-use App\Http\Controllers\ProdukController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\OrderController;
-use App\Http\Controllers\PenerbitController;
-use App\Http\Controllers\GenreController;
-use App\Http\Controllers\PembeliController;
 use App\Http\Controllers\BukuController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\FrontController;
+use App\Http\Controllers\GenreController;
+use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PembeliController;
+use App\Http\Controllers\PenerbitController;
+use App\Http\Controllers\PenggunasController;
+use App\Http\Controllers\PpdbsController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\SiswasController;
+use App\Http\Controllers\TeleponController;
 use App\Http\Controllers\TransaksiController;
-
+use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\isAdmin;
 
 
 /*
@@ -29,9 +30,15 @@ use App\Http\Controllers\TransaksiController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
+// Front
+Route::get('/', [FrontController::class, 'index']);
+Route::get('detail/{id}', [FrontController::class, 'show'])->name('show');
+// end
+
 
 Route::get('/home', function () {
     return 'Selamat datang di halaman HOME';
@@ -42,19 +49,19 @@ Route::get('/login', function () {
 });
 
 // ROUTE PARAMETER
-Route::get('/cek/{nama2}/{tempatlahir2}/{jk2}/{agama2}/{alamat}2', function($nama, $tempat_lahir,
+Route::get('/cek/{nama2}/{tempatlahir2}/{jk2}/{agama2}/{alamat}2', function ($nama, $tempat_lahir,
     $jk, $agama, $alamat) {
     return "Nama          :" . $nama . "<br>" .
-           "Tempat Lahir  :" . $tempat_lahir . "<br>" .
-           "Jenis Kelamin :" . $jk . "<br>" .
-           "Agama         :" . $agama . "<br>" .
-           "Alamat        :" . $alamat . "<br>";
+        "Tempat Lahir  :" . $tempat_lahir . "<br>" .
+        "Jenis Kelamin :" . $jk . "<br>" .
+        "Agama         :" . $agama . "<br>" .
+        "Alamat        :" . $alamat . "<br>";
 });
 
 Route::get('/hitung/{bil1}/{bil2}', function ($bilangan1, $bilangan2) {
     return "Bilangan 1 :" . $bilangan1 . "<br>" .
-           "Bilangan 2 :" . $bilangan2 . "<br>" .
-           "Hasil      :" . $hasil = $bilangan1 + $bilangan2;
+    "Bilangan 2 :" . $bilangan2 . "<br>" .
+    "Hasil      :" . $hasil = $bilangan1 + $bilangan2;
 });
 
 // Latihan
@@ -147,18 +154,17 @@ Route::get('/tugas/{nama1}/{telepon1}/{jenis1}/{barang1}/{jumlah1}/{bayar1}',
 // end latihan
 
 // route dg menggunakan view
-Route::get('/siswa', function () {
-    $data_siswa = ['Vika', 'Eva', 'Isma'];
+// Route::get('/siswa', function () {
+//     $data_siswa = ['Vika', 'Eva', 'Isma'];
 
-    return view('tampil', compact('data_siswa'));
-});
+//     return view('tampil', compact('data_siswa'));
+// });
 
 Route::get('/post', function () {
     $post = Post::all();
 
     return view('tampil_post', compact('post'));
 });
-
 
 // // Routing dg model
 // Route::get('/post', [PostsController::class, 'menampilkan']);
@@ -188,14 +194,9 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 
-// CRUD
-
-Route::resource('siswa', SiswasController::class);
-
 // CRUD PPDB
 
 Route::resource('ppdb', PpdbsController::class);
-
 
 // CRUD Pengguna
 
@@ -205,13 +206,13 @@ Route::resource('pengguna', PenggunasController::class);
 
 Route::resource('telepon', TeleponController::class);
 
-// CRUD Kategori
-
+// ROUTE MIDDLEWARE
+Route::prefix('admin')->middleware('auth',isAdmin::class)->group(function(){
+Route::resource('siswa', SiswasController::class);
 Route::resource('kategori', KategoriController::class);
-
-// CRUD Produk
-
 Route::resource('produk', ProdukController::class);
+});
+
 
 // CRUD Product
 
@@ -221,16 +222,13 @@ Route::resource('product', ProductController::class);
 
 Route::resource('customer', CustomerController::class);
 
-
 // CRUD Order
 
 Route::resource('order', OrderController::class);
 
-
 // CRUD Penerbit
 
 Route::resource('penerbit', PenerbitController::class);
-
 
 // CRUD Genre
 
